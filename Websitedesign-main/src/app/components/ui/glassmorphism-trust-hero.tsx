@@ -6,6 +6,7 @@ import {
     Crown,
     Star,
 } from "lucide-react";
+import { Link } from "react-router";
 import { assets } from "../../assets";
 import { OptimizedImage } from "./OptimizedImage";
 import { Button } from "./moving-border";
@@ -87,6 +88,8 @@ export default function HeroSection() {
                         {/* CTA Buttons */}
                         <div className="animate-fade-in delay-400 flex flex-col sm:flex-row gap-4">
                             <Button
+                                as={Link}
+                                to="/games"
                                 containerClassName="h-14 w-40"
                                 className="group inline-flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-400 text-sm font-semibold text-zinc-950 transition-all"
                                 borderClassName="bg-[radial-gradient(var(--color-teal-500)_40%,transparent_60%)]"
