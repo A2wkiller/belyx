@@ -1,13 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { assets } from "../assets";
 import { GlobalMap } from "../components/GlobalMap";
 import { FAQ } from "../components/FAQ";
 import { Testimonials } from "../components/Testimonials";
-import { Check, Cpu, MemoryStick, HardDrive, Zap, Shield, Globe, Headset, ChevronDown, ChevronUp, Users, Wrench, MapPin, ChevronRight } from "lucide-react";
+import {
+  Check,
+  Cpu,
+  MemoryStick,
+  HardDrive,
+  Zap,
+  Shield,
+  Globe,
+  Headset,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  Wrench,
+  MapPin,
+  ChevronRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import clsx from "clsx";
 import { spring } from "../lib/animations";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { InteractiveHoverButton } from "../components/ui/interactive-hover-button";
 
 // Import Assets
@@ -31,7 +47,7 @@ import imgCs2Icon from "@/assets/c82ff8fbe9fc26401e78bc69f98e3fd9d3442d77.png";
 
 import imgGarrysModIcon from "@/assets/5772eaa1b74aafcbf91af901345f72098fd056f8.png";
 import imgGarrysModBg from "@/assets/3e16f6bf7ae00f262f7683f2e9dbd0df2943bbaf.png";
-import imgConsole from "@/assets/d0696238e9f6f1dd710c59ccc4db62c6542d8b85.png";
+const imgConsole = "/img1/panel.png";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
 import svgPaths from "../../imports/svg-1rflh19blp";
@@ -49,6 +65,7 @@ type GameData = {
   id: string;
   name: string;
   bgImage: string;
+  videoSrc?: string;
   charImage: string;
   icon: string;
   pricingIcon: string;
@@ -63,152 +80,474 @@ const games: Record<string, GameData> = {
     id: "Minecraft",
     name: "Minecraft",
     bgImage: imgMinecraftBg,
+    videoSrc: "/vid/minecraft.mp4",
     charImage: imgMinecraftChar,
     icon: imgMinecraftIcon,
     pricingIcon: imgMinecraftPricingIcon,
     startingPrice: "₹40.00/month",
     starterPlans: [
-      { name: "Dirt", price: "₹40.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "Stone", price: "₹80.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
-      { name: "Iron", price: "₹120.00", ram: "6 GB RAM", cpu: "200% CPU", storage: "40 GB SSD", players: "Starter" },
+      {
+        name: "Dirt",
+        price: "₹40.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Stone",
+        price: "₹80.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Iron",
+        price: "₹120.00",
+        ram: "6 GB RAM",
+        cpu: "200% CPU",
+        storage: "40 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "Coal", price: "₹160.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Copper", price: "₹240.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
-      { name: "Gold", price: "₹320.00", ram: "16 GB RAM", cpu: "350% CPU", storage: "55 GB SSD", players: "Standard" },
+      {
+        name: "Coal",
+        price: "₹160.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Copper",
+        price: "₹240.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Gold",
+        price: "₹320.00",
+        ram: "16 GB RAM",
+        cpu: "350% CPU",
+        storage: "55 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "Redstone", price: "₹480.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "Diamond", price: "₹640.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
-      { name: "Netherite", price: "₹960.00", ram: "48 GB RAM", cpu: "600% CPU", storage: "70 GB SSD", players: "Premium" }
+      {
+        name: "Redstone",
+        price: "₹480.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Diamond",
+        price: "₹640.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Netherite",
+        price: "₹960.00",
+        ram: "48 GB RAM",
+        cpu: "600% CPU",
+        storage: "70 GB SSD",
+        players: "Premium",
+      },
     ],
   },
   ARK: {
     id: "ARK",
     name: "ARK",
     bgImage: imgArkBg,
+    videoSrc: "/vid/ark.mp4",
     charImage: imgArkChar,
     icon: imgArkIcon,
     pricingIcon: imgArkPricingIcon,
     startingPrice: "₹80.00/month",
     starterPlans: [
-      { name: "Alpha", price: "₹80.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "Beta", price: "₹160.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
+      {
+        name: "Alpha",
+        price: "₹90.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Beta",
+        price: "₹180.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "Gamma", price: "₹320.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Delta", price: "₹480.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
+      {
+        name: "Gamma",
+        price: "₹360.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Delta",
+        price: "₹540.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "Epsilon", price: "₹960.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "Zeta", price: "₹1280.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
+      {
+        name: "Epsilon",
+        price: "₹1080.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Zeta",
+        price: "₹1440.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
     ],
   },
   Hytale: {
     id: "Hytale",
     name: "Hytale",
     bgImage: imgHytaleBg,
+    videoSrc: "/vid/hytale.mp4",
     charImage: imgHytaleChar,
     icon: imgHytaleIcon,
     pricingIcon: imgHytalePricingIcon,
-    startingPrice: "₹80.00/month",
+    startingPrice: "₹90.00/month",
     starterPlans: [
-      { name: "Adventure", price: "₹80.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "Explorer", price: "₹160.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
+      {
+        name: "Adventure",
+        price: "₹90.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Explorer",
+        price: "₹180.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "Builder", price: "₹320.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Creator", price: "₹480.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
+      {
+        name: "Builder",
+        price: "₹360.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Creator",
+        price: "₹540.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "Master", price: "₹960.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "Legend", price: "₹1280.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
+      {
+        name: "Master",
+        price: "₹1080.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Legend",
+        price: "₹1440.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
     ],
   },
   GarrysMod: {
     id: "GarrysMod",
     name: "Garry's Mod",
     bgImage: assets.imgGarrysMod,
+    // No garrysmod.mp4 available – will fall back to static image
     charImage: imgGarrysModIcon,
     icon: imgGarrysModIcon,
     pricingIcon: imgGarrysModIcon,
-    startingPrice: "₹80.00/month",
+    startingPrice: "₹90.00/month",
     starterPlans: [
-      { name: "Sandbox", price: "₹80.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "TTT", price: "₹160.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
+      {
+        name: "Sandbox",
+        price: "₹90.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "TTT",
+        price: "₹180.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "DarkRP", price: "₹320.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Prop Hunt", price: "₹480.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
+      {
+        name: "DarkRP",
+        price: "₹360.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Prop Hunt",
+        price: "₹540.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "Jailbreak", price: "₹960.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "Deathrun", price: "₹1280.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
+      {
+        name: "Jailbreak",
+        price: "₹1080.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Deathrun",
+        price: "₹1440.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
     ],
   },
   CS2: {
     id: "CS2",
     name: "CS2",
     bgImage: assets.imgCsgo,
+    videoSrc: "/vid/cs2.mp4",
     charImage: imgCs2Icon, // Using icon as fallback/placeholder for char image
     icon: imgCs2Icon,
     pricingIcon: imgCs2Icon,
-    startingPrice: "₹80.00/month",
+    startingPrice: "₹90.00/month",
     starterPlans: [
-      { name: "Casual", price: "₹80.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "Premier", price: "₹160.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
+      {
+        name: "Casual",
+        price: "₹90.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Premier",
+        price: "₹180.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "Tournament", price: "₹320.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Pro", price: "₹480.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
+      {
+        name: "Tournament",
+        price: "₹360.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Pro",
+        price: "₹540.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "Elite", price: "₹960.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "Ultimate", price: "₹1280.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
+      {
+        name: "Elite",
+        price: "₹1080.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Ultimate",
+        price: "₹1440.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
     ],
   },
   Rust: {
     id: "Rust",
     name: "Rust",
     bgImage: assets.imgRust, // Using Rust banner
+    videoSrc: "/vid/rust.mp4",
     charImage: assets.imgRust, // Using icon/banner as placeholder
     icon: assets.imgRust,
     pricingIcon: assets.imgRust,
-    startingPrice: "₹80.00/month",
+    startingPrice: "₹90.00/month",
     starterPlans: [
-      { name: "Small", price: "₹80.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "Medium", price: "₹160.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
+      {
+        name: "Small",
+        price: "₹90.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Medium",
+        price: "₹180.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "Large", price: "₹320.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Extra Large", price: "₹480.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
+      {
+        name: "Large",
+        price: "₹360.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Extra Large",
+        price: "₹540.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "X-Large", price: "₹960.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "XX-Large", price: "₹1280.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
+      {
+        name: "X-Large",
+        price: "₹1080.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "XX-Large",
+        price: "₹1440.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
     ],
   },
   Valheim: {
     id: "Valheim",
     name: "Valheim",
     bgImage: assets.imgValheim, // Using Valheim banner
+    videoSrc: "/vid/valheim.mp4",
     charImage: assets.imgValheim, // Using Valheim icon/banner
     icon: assets.imgValheim,
     pricingIcon: assets.imgValheim,
-    startingPrice: "₹80.00/month",
+    startingPrice: "₹90.00/month",
     starterPlans: [
-      { name: "Spark", price: "₹80.00", ram: "2 GB RAM", cpu: "100% CPU", storage: "20 GB SSD", players: "Starter" },
-      { name: "Blaze", price: "₹160.00", ram: "4 GB RAM", cpu: "150% CPU", storage: "30 GB SSD", players: "Starter" },
+      {
+        name: "Spark",
+        price: "₹90.00",
+        ram: "2 GB RAM",
+        cpu: "100% CPU",
+        storage: "20 GB SSD",
+        players: "Starter",
+      },
+      {
+        name: "Blaze",
+        price: "₹180.00",
+        ram: "4 GB RAM",
+        cpu: "150% CPU",
+        storage: "30 GB SSD",
+        players: "Starter",
+      },
     ],
     standardPlans: [
-      { name: "Inferno", price: "₹320.00", ram: "8 GB RAM", cpu: "250% CPU", storage: "45 GB SSD", players: "Standard" },
-      { name: "Volcano", price: "₹480.00", ram: "12 GB RAM", cpu: "300% CPU", storage: "50 GB SSD", players: "Standard" },
+      {
+        name: "Inferno",
+        price: "₹360.00",
+        ram: "8 GB RAM",
+        cpu: "250% CPU",
+        storage: "45 GB SSD",
+        players: "Standard",
+      },
+      {
+        name: "Volcano",
+        price: "₹540.00",
+        ram: "12 GB RAM",
+        cpu: "300% CPU",
+        storage: "50 GB SSD",
+        players: "Standard",
+      },
     ],
     premiumPlans: [
-      { name: "Infinity", price: "₹960.00", ram: "24 GB RAM", cpu: "400% CPU", storage: "60 GB SSD", players: "Premium" },
-      { name: "Omega", price: "₹1280.00", ram: "32 GB RAM", cpu: "450% CPU", storage: "65 GB SSD", players: "Premium" },
+      {
+        name: "Infinity",
+        price: "₹1080.00",
+        ram: "24 GB RAM",
+        cpu: "400% CPU",
+        storage: "60 GB SSD",
+        players: "Premium",
+      },
+      {
+        name: "Omega",
+        price: "₹1440.00",
+        ram: "32 GB RAM",
+        cpu: "450% CPU",
+        storage: "65 GB SSD",
+        players: "Premium",
+      },
     ],
-  }
+  },
 };
 
 const gameList = [
@@ -223,6 +562,7 @@ const gameList = [
 
 export default function GameHosting() {
   const { gameId } = useParams();
+  const navigate = useNavigate();
   const [selectedGame, setSelectedGame] = useState("Minecraft");
 
   useEffect(() => {
@@ -231,31 +571,93 @@ export default function GameHosting() {
     }
   }, [gameId]);
   const [billingCycle, setBillingCycle] = useState<"Mo" | "3Mo" | "Yr">("Mo");
-  const [planTier, setPlanTier] = useState<"Starter" | "Standard" | "Premium">("Standard");
+  const [planTier, setPlanTier] = useState<"Starter" | "Standard" | "Premium">(
+    "Standard",
+  );
+
+  // Video state
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   const currentGame = games[selectedGame] || games["Minecraft"];
 
+  // Reset and play video whenever the selected game changes
+  useEffect(() => {
+    setVideoLoaded(false);
+    setVideoError(false);
+    if (videoRef.current && currentGame.videoSrc) {
+      videoRef.current.load();
+      videoRef.current.play().catch(() => {
+        setVideoError(true);
+      });
+    }
+  }, [currentGame.id]);
+
+  // Effective tier: fall back to Standard if selected tier has no plans
+  const effectiveTier =
+    (planTier === "Starter" && !currentGame.starterPlans) ||
+    (planTier === "Premium" && !currentGame.premiumPlans)
+      ? "Standard"
+      : planTier;
+
   // Determine which plans to show
   const currentPlans =
-    planTier === "Starter" ? (currentGame.starterPlans || currentGame.standardPlans) :
-      planTier === "Premium" ? (currentGame.premiumPlans || currentGame.standardPlans) :
-        currentGame.standardPlans;
+    effectiveTier === "Starter"
+      ? currentGame.starterPlans || currentGame.standardPlans
+      : effectiveTier === "Premium"
+        ? currentGame.premiumPlans || currentGame.standardPlans
+        : currentGame.standardPlans;
 
   // Calculate starting price dynamically based on first plan of selected tier
-  const displayStartingPrice = currentPlans.length > 0
-    ? `Starting from ${currentPlans[0].price}/month`
-    : currentGame.startingPrice;
+  const handleAddToCart = (plan: Plan) => {
+    try {
+      const cartItem = {
+        id: crypto.randomUUID(),
+        name: `${currentGame.name} — ${plan.name}`,
+        price: plan.price,
+        gameId: currentGame.id,
+        ram: plan.ram,
+        cpu: plan.cpu,
+        storage: plan.storage,
+        tier: effectiveTier,
+      };
+      const existingCart = JSON.parse(
+        localStorage.getItem("belyx_cart") || "[]",
+      );
+      localStorage.setItem(
+        "belyx_cart",
+        JSON.stringify([...existingCart, cartItem]),
+      );
+      toast.success(`${plan.name} added to cart!`, {
+        description: `${currentGame.name} · ${plan.ram} · ${plan.price}/mo`,
+        action: {
+          label: "View Cart",
+          onClick: () => navigate("/cart"),
+        },
+      });
+    } catch {
+      toast.error("Failed to add item to cart.");
+    }
+  };
+
+  const displayStartingPrice =
+    currentPlans.length > 0
+      ? `Starting from ${currentPlans[0].price}/month`
+      : currentGame.startingPrice;
 
   return (
     <div className="bg-[#0A0A0A] min-h-screen text-white font-sans overflow-hidden">
       {/* Hero Section */}
       <div className="relative pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
-
           <div className="text-center mb-12 relative z-10">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">GAME SERVER HOSTING</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+              GAME SERVER HOSTING
+            </h1>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              High-performance game servers with instant setup, DDoS protection, and powerful hardware for lag-free gaming.
+              High-performance game servers with instant setup, DDoS protection,
+              and powerful hardware for lag-free gaming.
             </p>
           </div>
 
@@ -267,7 +669,9 @@ export default function GameHosting() {
                 onClick={() => setBillingCycle(cycle as any)}
                 className={clsx(
                   "px-4 py-1.5 rounded-full text-xs font-medium transition-all relative",
-                  billingCycle === cycle ? "text-white" : "text-white/60 hover:text-white"
+                  billingCycle === cycle
+                    ? "text-white"
+                    : "text-white/60 hover:text-white",
                 )}
               >
                 {billingCycle === cycle && (
@@ -285,18 +689,65 @@ export default function GameHosting() {
           {/* Game Banner Card */}
           <div className="relative w-full max-w-6xl rounded-3xl overflow-hidden border border-white/10 shadow-2xl group mb-8">
             <div className="relative aspect-[21/9] md:aspect-[21/6]">
-              <ImageWithFallback
-                src={currentGame.bgImage}
-                alt={`${currentGame.name} banner`}
-                decoding="async"
-                fetchPriority="high"
-                sizes="(min-width:1024px) 60vw, 100vw"
-                width="1600"
-                height="600"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              {/* Video background (if available and no error) */}
+              {currentGame.videoSrc && !videoError ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    key={currentGame.id}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    poster={currentGame.bgImage}
+                    onLoadedData={() => setVideoLoaded(true)}
+                    onError={() => setVideoError(true)}
+                    className={clsx(
+                      "absolute inset-0 w-full h-full object-cover transition-opacity duration-700",
+                      videoLoaded ? "opacity-100" : "opacity-0",
+                    )}
+                  >
+                    <source src={currentGame.videoSrc} type="video/mp4" />
+                  </video>
+                  {/* Fallback image shown while video is loading */}
+                  {!videoLoaded && (
+                    <ImageWithFallback
+                      src={currentGame.bgImage}
+                      alt={`${currentGame.name} banner`}
+                      decoding="async"
+                      fetchPriority="high"
+                      sizes="(min-width:1024px) 60vw, 100vw"
+                      width="1600"
+                      height="600"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                </>
+              ) : (
+                /* Static image fallback – no video or video errored */
+                <ImageWithFallback
+                  src={currentGame.bgImage}
+                  alt={`${currentGame.name} banner`}
+                  decoding="async"
+                  fetchPriority="high"
+                  sizes="(min-width:1024px) 60vw, 100vw"
+                  width="1600"
+                  height="600"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              )}
+
+              <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
+
+              {/* Live indicator shown when video is playing */}
+              {videoLoaded && currentGame.videoSrc && !videoError && (
+                <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white/60 text-xs font-medium flex items-center gap-2 pointer-events-none">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span>LIVE</span>
+                </div>
+              )}
 
               <div className="absolute inset-0 flex items-center px-8 md:px-16">
                 <div className="flex items-center gap-6 max-w-3xl">
@@ -320,20 +771,31 @@ export default function GameHosting() {
                     </p>
 
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      {["Starter", "Standard", "Premium"].map((tier) => (
-                        <button
-                          key={tier}
-                          onClick={() => setPlanTier(tier as any)}
-                          className={clsx(
-                            "px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 backdrop-blur-sm border",
-                            planTier === tier
-                              ? "bg-teal-600 border-teal-500 text-white shadow-lg shadow-teal-500/30"
-                              : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white"
-                          )}
-                        >
-                          {tier}
-                        </button>
-                      ))}
+                      {(["Starter", "Standard", "Premium"] as const).map(
+                        (tier) => {
+                          const isDisabled =
+                            (tier === "Starter" && !currentGame.starterPlans) ||
+                            (tier === "Premium" && !currentGame.premiumPlans);
+                          const isActive = effectiveTier === tier;
+                          return (
+                            <button
+                              key={tier}
+                              onClick={() => !isDisabled && setPlanTier(tier)}
+                              disabled={isDisabled}
+                              className={clsx(
+                                "px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 backdrop-blur-sm border",
+                                isActive
+                                  ? "bg-teal-600 border-teal-500 text-white shadow-lg shadow-teal-500/30"
+                                  : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white",
+                                isDisabled &&
+                                  "opacity-30 cursor-not-allowed hover:bg-white/5 hover:text-white/70",
+                              )}
+                            >
+                              {tier}
+                            </button>
+                          );
+                        },
+                      )}
                     </div>
                   </div>
                 </div>
@@ -351,7 +813,7 @@ export default function GameHosting() {
                   "flex items-center gap-3 px-5 py-2.5 rounded-full border backdrop-blur-md transition-all duration-300",
                   selectedGame === game.id
                     ? "bg-teal-600 border-teal-500 text-white shadow-[0_0_20px_rgba(20,184,166,0.3)]"
-                    : "bg-teal-500/5 border-teal-500/10 text-white/60 hover:bg-teal-500/10 hover:border-teal-500/30 hover:text-white"
+                    : "bg-teal-500/5 border-teal-500/10 text-white/60 hover:bg-teal-500/10 hover:border-teal-500/30 hover:text-white",
                 )}
               >
                 <ImageWithFallback
@@ -374,10 +836,13 @@ export default function GameHosting() {
               // Determine if this is the popular plan
               // For Minecraft: Gold. For Garry's Mod: TTT. CS2: Premier. Others: 2nd plan.
               const isPopular =
-                selectedGame === "Minecraft" ? plan.name === "Gold" :
-                  selectedGame === "GarrysMod" ? plan.name === "TTT" :
-                    selectedGame === "CS2" ? plan.name === "Premier" :
-                      index === 1;
+                selectedGame === "Minecraft"
+                  ? plan.name === "Gold"
+                  : selectedGame === "GarrysMod"
+                    ? plan.name === "TTT"
+                    : selectedGame === "CS2"
+                      ? plan.name === "Premier"
+                      : index === 1;
 
               return (
                 <motion.div
@@ -389,7 +854,7 @@ export default function GameHosting() {
                     "relative rounded-3xl border transition-all duration-300 group",
                     isPopular
                       ? "bg-gradient-to-br from-teal-950/40 to-[#0a0a0a] border-teal-500/50 shadow-xl shadow-teal-500/10"
-                      : "bg-gradient-to-br from-[#111] to-[#0a0a0a] border-white/10 hover:border-teal-500/30"
+                      : "bg-gradient-to-br from-[#111] to-[#0a0a0a] border-white/10 hover:border-teal-500/30",
                   )}
                 >
                   {isPopular && (
@@ -425,7 +890,9 @@ export default function GameHosting() {
                           />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                          <h3 className="text-xl font-bold text-white">
+                            {plan.name}
+                          </h3>
                           <p className="text-white/40 text-xs">
                             {currentGame.name} Server
                           </p>
@@ -435,8 +902,12 @@ export default function GameHosting() {
 
                     <div className="mb-6 relative z-10">
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-white">{plan.price}</span>
-                        <span className="text-white/40 font-medium text-sm">/month</span>
+                        <span className="text-3xl font-bold text-white">
+                          {plan.price}
+                        </span>
+                        <span className="text-white/40 font-medium text-sm">
+                          /month
+                        </span>
                       </div>
                     </div>
 
@@ -445,30 +916,39 @@ export default function GameHosting() {
                         <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
                           <MemoryStick className="w-4 h-4 text-teal-400" />
                         </div>
-                        <span className="text-xs font-medium text-white/80">{plan.ram}</span>
+                        <span className="text-xs font-medium text-white/80">
+                          {plan.ram}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
                           <Cpu className="w-4 h-4 text-teal-400" />
                         </div>
-                        <span className="text-xs font-medium text-white/80">{plan.cpu}</span>
+                        <span className="text-xs font-medium text-white/80">
+                          {plan.cpu}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
                           <HardDrive className="w-4 h-4 text-teal-400" />
                         </div>
-                        <span className="text-xs font-medium text-white/80">{plan.storage}</span>
+                        <span className="text-xs font-medium text-white/80">
+                          {plan.storage}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
                           <Users className="w-4 h-4 text-teal-400" />
                         </div>
-                        <span className="text-xs font-medium text-white/80">{plan.players}</span>
+                        <span className="text-xs font-medium text-white/80">
+                          {plan.players}
+                        </span>
                       </div>
                     </div>
 
                     <InteractiveHoverButton
                       text="Order Now"
+                      onClick={() => handleAddToCart(plan)}
                       className="w-full bg-teal-500 text-black border-teal-600 hover:bg-teal-600"
                     />
                   </div>
@@ -479,10 +959,26 @@ export default function GameHosting() {
 
           {/* Features Strip */}
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-12 w-full max-w-5xl">
-            <FeaturePill icon={Zap} title="Instant Setup" subtitle="Ready in seconds" />
-            <FeaturePill icon={Shield} title="DDoS Protection" subtitle="Enterprise-grade" />
-            <FeaturePill icon={Wrench} title="Mod Support" subtitle="Easy installation" />
-            <FeaturePill icon={Headset} title="24/7 Support" subtitle="Always here to help" />
+            <FeaturePill
+              icon={Zap}
+              title="Instant Setup"
+              subtitle="Ready in seconds"
+            />
+            <FeaturePill
+              icon={Shield}
+              title="DDoS Protection"
+              subtitle="Enterprise-grade"
+            />
+            <FeaturePill
+              icon={Wrench}
+              title="Mod Support"
+              subtitle="Easy installation"
+            />
+            <FeaturePill
+              icon={Headset}
+              title="24/7 Support"
+              subtitle="Always here to help"
+            />
           </div>
         </div>
       </div>
@@ -492,29 +988,47 @@ export default function GameHosting() {
         <div className="absolute inset-0 bg-[url('/assets/noise.svg')] opacity-20 mix-blend-overlay" />
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
           <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Powerful Control Panel</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Powerful Control Panel
+            </h2>
             <p className="text-white/60 text-lg mb-8 leading-relaxed">
-              Manage your game server without hassle. Our custom-built control panel powered by Pterodactyl gives you full control over your server files, plugins, and settings right at your fingertips.
+              Manage your game server without hassle. Our custom-built control
+              panel powered by Pterodactyl gives you full control over your
+              server files, plugins, and settings right at your fingertips.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
                 { title: "Instant Deploy", desc: "Server ready in seconds" },
-                { title: "One-Click Install", desc: "Mods & plugins made easy" },
+                {
+                  title: "One-Click Install",
+                  desc: "Mods & plugins made easy",
+                },
                 { title: "Real-Time Stats", desc: "Monitor performance live" },
-                { title: "Secure Access", desc: "2FA & sub-user management" }
+                { title: "Secure Access", desc: "2FA & sub-user management" },
               ].map((item) => (
-                <div key={item.title} className="bg-black/20 p-4 rounded-2xl border border-white/5 hover:border-teal-500/30 transition-colors group">
-                  <h4 className="text-teal-400 font-bold mb-1 group-hover:text-teal-300">{item.title}</h4>
+                <div
+                  key={item.title}
+                  className="bg-black/20 p-4 rounded-2xl border border-white/5 hover:border-teal-500/30 transition-colors group"
+                >
+                  <h4 className="text-teal-400 font-bold mb-1 group-hover:text-teal-300">
+                    {item.title}
+                  </h4>
                   <p className="text-white/40 text-sm">{item.desc}</p>
                 </div>
               ))}
             </div>
 
             <div className="flex items-center gap-4 mt-8">
-              <button className="px-6 py-2 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-500 transition-colors">Console</button>
-              <button className="px-6 py-2 rounded-full bg-white/5 text-white/60 font-medium text-sm hover:text-white hover:bg-white/10 transition-colors">File Manager</button>
-              <button className="px-6 py-2 rounded-full bg-white/5 text-white/60 font-medium text-sm hover:text-white hover:bg-white/10 transition-colors">Activity</button>
+              <button className="px-6 py-2 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-500 transition-colors">
+                Console
+              </button>
+              <button className="px-6 py-2 rounded-full bg-white/5 text-white/60 font-medium text-sm hover:text-white hover:bg-white/10 transition-colors">
+                File Manager
+              </button>
+              <button className="px-6 py-2 rounded-full bg-white/5 text-white/60 font-medium text-sm hover:text-white hover:bg-white/10 transition-colors">
+                Activity
+              </button>
             </div>
           </div>
 
@@ -577,15 +1091,20 @@ export default function GameHosting() {
         <div className="absolute inset-0 bg-gradient-to-t from-teal-900/20 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
           <div className="md:max-w-lg">
-            <h2 className="text-4xl font-bold text-white mb-4">Make The Switch</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Make The Switch
+            </h2>
             <p className="text-white/60 mb-8">
-              Join thousands of gamers who switched to faster, more reliable hosting. Experience the difference today.
+              Join thousands of gamers who switched to faster, more reliable
+              hosting. Experience the difference today.
             </p>
           </div>
 
           <div className="bg-gradient-to-br from-teal-500/10 to-teal-500/5 backdrop-blur-md border border-teal-500/20 p-8 rounded-3xl text-center md:text-right">
             <p className="text-sm font-bold text-white mb-1">SAVE 10%</p>
-            <p className="text-xs text-teal-400 mb-6 uppercase tracking-widest">USE COUPON CODE: WELCOME10</p>
+            <p className="text-xs text-teal-400 mb-6 uppercase tracking-widest">
+              USE COUPON CODE: WELCOME10
+            </p>
 
             <div className="flex items-center gap-4 justify-center md:justify-end text-white">
               <div className="text-center">
@@ -611,12 +1130,19 @@ export default function GameHosting() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
 
-function FeaturePill({ icon: Icon, title, subtitle }: { icon: any, title: string, subtitle: string }) {
+function FeaturePill({
+  icon: Icon,
+  title,
+  subtitle,
+}: {
+  icon: any;
+  title: string;
+  subtitle: string;
+}) {
   return (
     <div className="flex items-center gap-4 bg-teal-500/5 backdrop-blur-sm border border-teal-500/10 rounded-full pl-2 pr-6 py-2">
       <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center text-teal-400">
@@ -630,7 +1156,15 @@ function FeaturePill({ icon: Icon, title, subtitle }: { icon: any, title: string
   );
 }
 
-function FeatureCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  desc,
+}: {
+  icon: any;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="p-6 rounded-2xl border border-white/5 bg-[#111] hover:border-teal-500/20 transition-colors group">
       <div className="w-12 h-12 rounded-xl bg-teal-500/5 flex items-center justify-center text-teal-400 mb-6 group-hover:bg-teal-500 group-hover:text-black transition-all">
