@@ -1,0 +1,28 @@
+@layer utilities {
+  .glass-effect {
+    @apply bg-white/10 border border-white/20 shadow-lg;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .glass-effect-pill {
+    @apply bg-white/5 border border-white/10 shadow-xl;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .glass-effect-card {
+    @apply bg-white/5 border border-white/10 shadow-lg;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Fallbacks for browsers that don't support backdrop-filter */
+  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .glass-effect,
+    .glass-effect-pill,
+    .glass-effect-card {
+      @apply bg-gray-800/80 border-gray-700;
+    }
+  }
+}
