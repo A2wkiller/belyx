@@ -1,7 +1,7 @@
 
   # Website Design
 
-  This is a code bundle for Website Design. The original project is available at https://www.figma.com/design/zfpAsnsnIvqEE0gT8NiedH/Website-Design.
+  This is a code bundle for Website Design. The original project is available at .
 
   ## Running the code
 
