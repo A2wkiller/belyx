@@ -169,6 +169,15 @@ export default function Cart() {
 
   const handleCheckout = () => {
     if (grouped.length === 0) return;
+
+    const hasMinecraft = grouped.some((item) => item.gameId === "Minecraft");
+
+    if (hasMinecraft) {
+      window.location.href =
+        "https://billing.belyxhost.com/index.php?rp=/store/minecraft";
+      return;
+    }
+
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);

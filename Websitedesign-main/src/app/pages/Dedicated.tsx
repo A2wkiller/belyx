@@ -3,10 +3,10 @@ import { Features } from "../components/Features";
 
 import { FAQ } from "../components/FAQ";
 import { Testimonials } from "../components/Testimonials";
-import { Check, Server, Cpu, HardDrive, Network, ChevronRight } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { Server, Cpu, HardDrive, Network, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useState } from "react";
+
 import { Button } from "../components/ui/moving-border";
 
 const plans = [
@@ -59,7 +59,7 @@ const plans = [
 export default function Dedicated() {
   const navigate = useNavigate();
 
-  const handleAddToCart = (plan: any) => {
+  const handleAddToCart = (plan: { name: string; price: string }) => {
     try {
       const cartItem = {
         id: crypto.randomUUID(),
@@ -68,14 +68,15 @@ export default function Dedicated() {
         gameId: "dedicated",
       };
 
-      const existingCart = JSON.parse(localStorage.getItem("belyx_cart") || "[]");
+      const existingCart = JSON.parse(
+        localStorage.getItem("belyx_cart") || "[]",
+      );
       const updatedCart = [...existingCart, cartItem];
       localStorage.setItem("belyx_cart", JSON.stringify(updatedCart));
 
       toast.success(`${plan.name} added to cart!`);
       navigate("/cart");
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
+    } catch {
       toast.error("Failed to add item to cart. Please try again.");
     }
   };
@@ -83,18 +84,29 @@ export default function Dedicated() {
   return (
     <div className="bg-[#0A0A0A] pt-20">
       <div className="text-center py-20 px-6">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">DEDICATED SERVERS</h1>
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          DEDICATED SERVERS
+        </h1>
         <p className="text-white/60 max-w-2xl mx-auto text-lg">
-          Enterprise bare metal servers with full root access, dedicated resources, and maximum performance.
+          Enterprise bare metal servers with full root access, dedicated
+          resources, and maximum performance.
         </p>
       </div>
 
       {/* Filters */}
       <div className="max-w-7xl mx-auto px-6 mb-12 flex flex-wrap gap-4 justify-center">
-        <button className="bg-teal-500 text-black px-6 py-2 rounded-full font-bold text-sm">All Processors</button>
-        <button className="bg-white/5 text-white/70 hover:text-white px-6 py-2 rounded-full font-medium text-sm border border-white/10">AMD</button>
-        <button className="bg-white/5 text-white/70 hover:text-white px-6 py-2 rounded-full font-medium text-sm border border-white/10">Intel</button>
-        <button className="bg-white/5 text-white/70 hover:text-white px-6 py-2 rounded-full font-medium text-sm border border-white/10">Storage</button>
+        <button className="bg-teal-500 text-black px-6 py-2 rounded-full font-bold text-sm">
+          All Processors
+        </button>
+        <button className="bg-white/5 text-white/70 hover:text-white px-6 py-2 rounded-full font-medium text-sm border border-white/10">
+          AMD
+        </button>
+        <button className="bg-white/5 text-white/70 hover:text-white px-6 py-2 rounded-full font-medium text-sm border border-white/10">
+          Intel
+        </button>
+        <button className="bg-white/5 text-white/70 hover:text-white px-6 py-2 rounded-full font-medium text-sm border border-white/10">
+          Storage
+        </button>
       </div>
 
       {/* Pricing Table */}
@@ -106,11 +118,17 @@ export default function Dedicated() {
           >
             <div className="flex items-center gap-4 min-w-[200px]">
               <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center p-2">
-                <img src={assets.imgIntel} alt="CPU" className="w-full h-full object-contain invert opacity-80" />
+                <img
+                  src={assets.imgIntel}
+                  alt="CPU"
+                  className="w-full h-full object-contain invert opacity-80"
+                />
               </div>
               <div>
                 <h3 className="text-white font-bold text-lg">{plan.name}</h3>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${plan.stock === "In Stock" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full ${plan.stock === "In Stock" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}
+                >
                   {plan.stock}
                 </span>
               </div>
@@ -162,7 +180,6 @@ export default function Dedicated() {
           </div>
         ))}
       </div>
-
 
       <Features />
       <FAQ />

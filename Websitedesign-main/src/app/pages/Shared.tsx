@@ -1,11 +1,12 @@
 import { motion } from "motion/react";
 import { viewportDefaults, spring } from "../lib/animations";
-import { Shield, Zap, Globe, Cpu, Clock, Server, Info, ChevronDown } from "lucide-react";
+import { Shield, Zap, Globe, Cpu, Clock, Server, Info } from "lucide-react";
 import { useState } from "react";
 
-import { FAQ } from "../components/FAQ";
 import { Testimonials } from "../components/Testimonials";
-import { Link, useNavigate } from "react-router";
+import { FAQ } from "../components/FAQ";
+import { useNavigate } from "react-router";
+import { CountdownTimer } from "../components/ui/CountdownTimer";
 import { assets } from "../assets";
 import { toast } from "sonner";
 import { Button } from "../components/ui/moving-border";
@@ -16,7 +17,7 @@ export default function Shared() {
   const [cpuFilter, setCpuFilter] = useState("all"); // all, amd, intel
   const [locationFilter, setLocationFilter] = useState("all"); // all, in, sg
 
-  const handleAddToCart = (plan: any) => {
+  const handleAddToCart = (plan: { name: string; price: string }) => {
     try {
       const cartItem = {
         id: crypto.randomUUID(),
@@ -25,14 +26,15 @@ export default function Shared() {
         gameId: "vps",
       };
 
-      const existingCart = JSON.parse(localStorage.getItem("belyx_cart") || "[]");
+      const existingCart = JSON.parse(
+        localStorage.getItem("belyx_cart") || "[]",
+      );
       const updatedCart = [...existingCart, cartItem];
       localStorage.setItem("belyx_cart", JSON.stringify(updatedCart));
 
       toast.success(`${plan.name} added to cart!`);
       navigate("/cart");
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
+    } catch {
       toast.error("Failed to add item to cart. Please try again.");
     }
   };
@@ -45,11 +47,11 @@ export default function Shared() {
         cpu: "4 vCPU Cores",
         ram: "8 GB DDR4 RAM",
         storage: "80 GB NVMe SSD",
-        bandwidth: "Unmetered Bandwidth"
+        bandwidth: "Unmetered Bandwidth",
       },
       category: "performance",
       cpuType: "amd",
-      popular: false
+      popular: false,
     },
     {
       name: "Platinum 6 vCore / 16 GB",
@@ -58,11 +60,11 @@ export default function Shared() {
         cpu: "6 vCPU Cores",
         ram: "16 GB DDR4 RAM",
         storage: "150 GB NVMe SSD",
-        bandwidth: "Unmetered Bandwidth"
+        bandwidth: "Unmetered Bandwidth",
       },
       category: "performance",
       cpuType: "amd",
-      popular: false
+      popular: false,
     },
     {
       name: "Platinum 6 vCore / 24 GB",
@@ -71,11 +73,11 @@ export default function Shared() {
         cpu: "6 vCPU Cores",
         ram: "24 GB DDR4 RAM",
         storage: "300 GB NVMe SSD",
-        bandwidth: "Unmetered Bandwidth"
+        bandwidth: "Unmetered Bandwidth",
       },
       category: "performance",
       cpuType: "intel",
-      popular: false
+      popular: false,
     },
     {
       name: "Platinum 8 vCore / 32 GB",
@@ -84,50 +86,49 @@ export default function Shared() {
         cpu: "8 vCPU Cores",
         ram: "32 GB DDR4 RAM",
         storage: "200 GB NVMe SSD",
-        bandwidth: "Unmetered Bandwidth"
+        bandwidth: "Unmetered Bandwidth",
       },
       category: "performance",
       cpuType: "intel",
-      popular: true
-    }
+      popular: true,
+    },
   ];
 
   const features = [
     {
       icon: <Zap className="w-6 h-6 text-teal-400" />,
       title: "Instant Setup",
-      desc: "Get your server up and running in seconds. No complicated configurations."
+      desc: "Get your server up and running in seconds. No complicated configurations.",
     },
     {
       icon: <Shield className="w-6 h-6 text-teal-400" />,
       title: "DDoS Protection",
-      desc: "Enterprise protection keeps your server online and secure against any attack."
+      desc: "Enterprise protection keeps your server online and secure against any attack.",
     },
     {
       icon: <Clock className="w-6 h-6 text-teal-400" />,
       title: "99.9% Uptime",
-      desc: "Our redundant infrastructure ensures your server stays online."
+      desc: "Our redundant infrastructure ensures your server stays online.",
     },
     {
       icon: <Info className="w-6 h-6 text-teal-400" />,
       title: "24/7 Support",
-      desc: "Expert support team available around the clock to help with any issues."
+      desc: "Expert support team available around the clock to help with any issues.",
     },
     {
       icon: <Cpu className="w-6 h-6 text-teal-400" />,
       title: "Powerful Hardware",
-      desc: "High performance NVMe SSDs and latest gen CPUs for lag-free gaming."
+      desc: "High performance NVMe SSDs and latest gen CPUs for lag-free gaming.",
     },
     {
       icon: <Globe className="w-6 h-6 text-teal-400" />,
       title: "Global Locations",
-      desc: "Multiple data centers worldwide to ensure low latency for all players."
-    }
+      desc: "Multiple data centers worldwide to ensure low latency for all players.",
+    },
   ];
 
   return (
     <div className="bg-[#0A0A0A] min-h-screen pt-20">
-
       {/* Hero / Pricing Section */}
       <section className="py-20 px-6 max-w-7xl mx-auto relative">
         <div className="text-center mb-16">
@@ -145,7 +146,8 @@ export default function Shared() {
             transition={{ ...spring.gentle, delay: 0.08 }}
             className="text-white/50 max-w-2xl mx-auto text-lg"
           >
-            High-performance virtual private servers with full root access, SSD storage, and instant deployment.
+            High-performance virtual private servers with full root access, SSD
+            storage, and instant deployment.
           </motion.p>
         </div>
 
@@ -153,11 +155,11 @@ export default function Shared() {
         <div className="flex flex-col items-center gap-6 mb-12">
           {/* Category Tabs */}
           <div className="bg-[#111] p-1 rounded-full flex gap-1 border border-white/5">
-            {['Budget', 'Performance', 'Enterprise'].map((cat) => (
+            {["Budget", "Performance", "Enterprise"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat.toLowerCase())}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${category === cat.toLowerCase() ? 'bg-teal-500 text-black shadow-lg shadow-teal-500/20' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${category === cat.toLowerCase() ? "bg-teal-500 text-black shadow-lg shadow-teal-500/20" : "text-white/60 hover:text-white hover:bg-white/5"}`}
               >
                 {cat}
               </button>
@@ -168,22 +170,22 @@ export default function Shared() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <div className="flex items-center bg-[#111] rounded-full border border-white/5 px-2 py-1">
               <button
-                onClick={() => setCpuFilter('all')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${cpuFilter === 'all' ? 'bg-teal-500 text-black' : 'text-white/40 hover:text-white'}`}
+                onClick={() => setCpuFilter("all")}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${cpuFilter === "all" ? "bg-teal-500 text-black" : "text-white/40 hover:text-white"}`}
               >
                 All
               </button>
               <span className="text-white/10 mx-1">-</span>
               <button
-                onClick={() => setCpuFilter('amd')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${cpuFilter === 'amd' ? 'bg-teal-500 text-black' : 'text-white/40 hover:text-white'}`}
+                onClick={() => setCpuFilter("amd")}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${cpuFilter === "amd" ? "bg-teal-500 text-black" : "text-white/40 hover:text-white"}`}
               >
                 AMD
               </button>
               <span className="text-white/10 mx-1">-</span>
               <button
-                onClick={() => setCpuFilter('intel')}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${cpuFilter === 'intel' ? 'bg-teal-500 text-black' : 'text-white/40 hover:text-white'}`}
+                onClick={() => setCpuFilter("intel")}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${cpuFilter === "intel" ? "bg-teal-500 text-black" : "text-white/40 hover:text-white"}`}
               >
                 Intel
               </button>
@@ -191,15 +193,15 @@ export default function Shared() {
 
             <div className="flex items-center bg-[#111] rounded-full border border-white/5 px-2 py-1">
               <button
-                onClick={() => setLocationFilter('in')}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${locationFilter === 'in' ? 'bg-teal-500 text-black' : 'text-white/40 hover:text-white'}`}
+                onClick={() => setLocationFilter("in")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${locationFilter === "in" ? "bg-teal-500 text-black" : "text-white/40 hover:text-white"}`}
               >
                 IN
               </button>
               <span className="text-white/10 mx-1">-</span>
               <button
-                onClick={() => setLocationFilter('sg')}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${locationFilter === 'sg' ? 'bg-teal-500 text-black' : 'text-white/40 hover:text-white'}`}
+                onClick={() => setLocationFilter("sg")}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${locationFilter === "sg" ? "bg-teal-500 text-black" : "text-white/40 hover:text-white"}`}
               >
                 SG
               </button>
@@ -216,7 +218,7 @@ export default function Shared() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={viewportDefaults}
               transition={{ ...spring.snappy, delay: i * 0.07 }}
-              className={`relative p-6 rounded-3xl border flex flex-col group transition-all duration-300 ${plan.popular ? 'bg-[#0F1615] border-teal-500/30 shadow-[0_0_30px_rgba(20,184,166,0.1)]' : 'bg-[#0A0A0A] border-white/10 hover:border-teal-500/20'}`}
+              className={`relative p-6 rounded-3xl border flex flex-col group transition-all duration-300 ${plan.popular ? "bg-[#0F1615] border-teal-500/30 shadow-[0_0_30px_rgba(20,184,166,0.1)]" : "bg-[#0A0A0A] border-white/10 hover:border-teal-500/20"}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal-500 text-black text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg z-10">
@@ -225,9 +227,13 @@ export default function Shared() {
               )}
 
               <div className="mb-4">
-                <h3 className="text-white font-bold text-lg leading-tight mb-2">{plan.name}</h3>
+                <h3 className="text-white font-bold text-lg leading-tight mb-2">
+                  {plan.name}
+                </h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-white">{plan.price}</span>
+                  <span className="text-2xl font-bold text-white">
+                    {plan.price}
+                  </span>
                   <span className="text-white/40 text-xs">/month</span>
                 </div>
               </div>
@@ -236,19 +242,24 @@ export default function Shared() {
 
               <div className="space-y-4 mb-8 flex-1">
                 <div className="flex items-start gap-3 text-xs font-medium text-white/60">
-                  <Cpu className="w-4 h-4 text-teal-500 shrink-0" /> {plan.specs.cpu}
+                  <Cpu className="w-4 h-4 text-teal-500 shrink-0" />{" "}
+                  {plan.specs.cpu}
                 </div>
                 <div className="flex items-start gap-3 text-xs font-medium text-white/60">
-                  <Zap className="w-4 h-4 text-teal-500 shrink-0" /> {plan.specs.ram}
+                  <Zap className="w-4 h-4 text-teal-500 shrink-0" />{" "}
+                  {plan.specs.ram}
                 </div>
                 <div className="flex items-start gap-3 text-xs font-medium text-white/60">
-                  <Server className="w-4 h-4 text-teal-500 shrink-0" /> {plan.specs.storage}
+                  <Server className="w-4 h-4 text-teal-500 shrink-0" />{" "}
+                  {plan.specs.storage}
                 </div>
                 <div className="flex items-start gap-3 text-xs font-medium text-white/60">
-                  <Globe className="w-4 h-4 text-teal-500 shrink-0" /> {plan.specs.bandwidth}
+                  <Globe className="w-4 h-4 text-teal-500 shrink-0" />{" "}
+                  {plan.specs.bandwidth}
                 </div>
                 <div className="flex items-start gap-3 text-xs font-medium text-white/60">
-                  <Info className="w-4 h-4 text-teal-500 shrink-0" /> Support included
+                  <Info className="w-4 h-4 text-teal-500 shrink-0" /> Support
+                  included
                 </div>
               </div>
 
@@ -278,17 +289,31 @@ export default function Shared() {
 
         {/* Supported OS */}
         <div className="flex flex-wrap justify-center items-center gap-8 opacity-40 mb-20 grayscale hover:grayscale-0 transition-all duration-500">
-          {['Ubuntu', 'Debian', 'CentOS', 'Fedora', 'Windows', 'Alpine', 'Arch'].map((os) => (
-            <div key={os} className="flex items-center gap-2 text-white font-medium group cursor-default">
-              <div className={`w-2 h-2 rounded-full ${os === 'Ubuntu' ? 'bg-orange-500' : os === 'Debian' ? 'bg-red-500' : os === 'Windows' ? 'bg-blue-500' : 'bg-teal-500'} group-hover:scale-150 transition-transform`} />
-              <span className="group-hover:text-white transition-colors">{os}</span>
+          {[
+            "Ubuntu",
+            "Debian",
+            "CentOS",
+            "Fedora",
+            "Windows",
+            "Alpine",
+            "Arch",
+          ].map((os) => (
+            <div
+              key={os}
+              className="flex items-center gap-2 text-white font-medium group cursor-default"
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${os === "Ubuntu" ? "bg-orange-500" : os === "Debian" ? "bg-red-500" : os === "Windows" ? "bg-blue-500" : "bg-teal-500"} group-hover:scale-150 transition-transform`}
+              />
+              <span className="group-hover:text-white transition-colors">
+                {os}
+              </span>
             </div>
           ))}
         </div>
       </section>
 
       {/* Global Locations */}
-
 
       {/* Features Grid */}
       <section className="py-20 px-6 max-w-7xl mx-auto">
@@ -308,40 +333,19 @@ export default function Shared() {
               <div className="mb-6 w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center group-hover:bg-teal-500/20 transition-colors">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-bold text-white mb-3">{feature.title}</h3>
-              <p className="text-white/50 text-sm leading-relaxed">{feature.desc}</p>
+              <h3 className="text-lg font-bold text-white mb-3">
+                {feature.title}
+              </h3>
+              <p className="text-white/50 text-sm leading-relaxed">
+                {feature.desc}
+              </p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* FAQ */}
-      <div className="max-w-4xl mx-auto py-20 px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div>
-            <h2 className="text-4xl font-bold text-white mb-6 leading-tight">Frequently<br />Asked<br />Questions</h2>
-            <p className="text-white/50 mb-8">Everything you need to know about our game hosting services.</p>
-            <button className="bg-teal-500 hover:bg-teal-400 text-black font-bold py-3 px-6 rounded-xl transition-colors">
-              Contact Support
-            </button>
-          </div>
-          <div className="space-y-4">
-            {[
-              "What games do you support?",
-              "How quickly can I get my server up and running?",
-              "What kind of support do you offer?",
-              "Can I upgrade my server later?"
-            ].map((q, i) => (
-              <div key={i} className="group border-b border-white/10 pb-4">
-                <button className="flex items-center justify-between w-full text-left text-white font-medium group-hover:text-teal-400 transition-colors">
-                  {q}
-                  <ChevronDown className="w-4 h-4 text-white/30 group-hover:text-teal-400 transition-colors" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <FAQ />
 
       {/* Testimonials */}
       <Testimonials />
@@ -354,28 +358,31 @@ export default function Shared() {
 
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="text-left">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Make The Switch</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Make The Switch
+              </h2>
               <p className="text-white/60 max-w-lg text-lg mb-8">
-                Join thousands of gamers who switched to faster, more reliable hosting. Experience the difference today.
+                Join thousands of gamers who switched to faster, more reliable
+                hosting. Experience the difference today.
               </p>
               <div className="flex gap-4">
-                <img src={assets.imgBelyxHostLogo} className="h-8 grayscale opacity-50" />
+                <img
+                  src={assets.imgBelyxHostLogo}
+                  className="h-8 grayscale opacity-50"
+                />
               </div>
             </div>
 
             <div className="text-right">
               <div className="text-right mb-6">
                 <p className="text-white font-bold text-2xl">SAVE 10%</p>
-                <p className="text-white/40 text-sm uppercase tracking-wider">USE COUPON CODE <span className="text-white font-bold">WELCOME10</span></p>
+                <p className="text-white/40 text-sm uppercase tracking-wider">
+                  USE COUPON CODE{" "}
+                  <span className="text-white font-bold">WELCOME10</span>
+                </p>
               </div>
-              <div className="flex items-center justify-end gap-4 font-mono text-3xl font-bold text-white">
-                <div className="text-center">00<span className="text-[10px] font-sans text-white/40 block mt-1">DAYS</span></div>
-                <div>:</div>
-                <div className="text-center">14<span className="text-[10px] font-sans text-white/40 block mt-1">HRS</span></div>
-                <div>:</div>
-                <div className="text-center">44<span className="text-[10px] font-sans text-white/40 block mt-1">MIN</span></div>
-                <div>:</div>
-                <div className="text-center">06<span className="text-[10px] font-sans text-white/40 block mt-1">SEC</span></div>
+              <div className="flex items-center justify-end">
+                <CountdownTimer labelSize="text-[10px]" />
               </div>
             </div>
           </div>

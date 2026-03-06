@@ -6,9 +6,9 @@ const BASE_URL = 'https://belyxhost.com';
 // This would ideally fetch from your CMS or Database
 const games = [
   { id: 'Minecraft', name: 'Minecraft', img: '/assets/minecraft.png' },
-  { id: 'Rust', name: 'Rust', img: '/assets/rust.png' },
+  { id: 'Rust', name: 'Rust', img: '/assets/Rust-Logo.jpg' },
   { id: 'ARK', name: 'Ark: SE', img: '/assets/ark.png' },
-  { id: 'Valheim', name: 'Valheim', img: '/assets/valheim.png' },
+  { id: 'Valheim', name: 'Valheim', img: '/assets/valheim-logo.png' },
   { id: 'GarrysMod', name: 'Garry\'s Mod', img: '/assets/garrysmod.png' },
   { id: 'CS2', name: 'CS:GO', img: '/assets/csgo.png' },
 ];

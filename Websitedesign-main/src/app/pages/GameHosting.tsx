@@ -4,7 +4,6 @@ import { GlobalMap } from "../components/GlobalMap";
 import { FAQ } from "../components/FAQ";
 import { Testimonials } from "../components/Testimonials";
 import {
-  Check,
   Cpu,
   MemoryStick,
   HardDrive,
@@ -12,45 +11,37 @@ import {
   Shield,
   Globe,
   Headset,
-  ChevronDown,
-  ChevronUp,
   Users,
   Wrench,
   MapPin,
-  ChevronRight,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import clsx from "clsx";
 import { spring } from "../lib/animations";
-import { useParams, Link, useNavigate } from "react-router";
+import { useParams, useNavigate } from "react-router";
+import { CountdownTimer } from "../components/ui/CountdownTimer";
 import { toast } from "sonner";
 import { InteractiveHoverButton } from "../components/ui/interactive-hover-button";
 
 // Import Assets
 import imgMinecraftBg from "@/assets/e5c968a58f45453295ad7a7c62e3e2f86b0a2410.png";
-import imgMinecraftChar from "@/assets/a152bda96d5c532467d9d67bab5147033a068957.png";
 import imgMinecraftIcon from "@/assets/0c0f675c0f288901b7ba38bd8c7e4c12a9287a84.png";
 import imgMinecraftPricingIcon from "@/assets/1bd2706a2cae8bc4b83b67be24ead2aea5edd13b.png";
 
 import imgArkBg from "@/assets/ed20c023643af742a4779d1d702a15ecad5221be.png";
-import imgArkChar from "@/assets/83eb5048dcf5c24d217b0229f22e11435f0efd75.png";
 import imgArkIcon from "@/assets/a6380ed7923373c70790a9bd9c19d23698c9769f.png";
 import imgArkPricingIcon from "@/assets/57d153381d6c8978989e9e59494fa2b4625bbe61.png";
 
 import imgHytaleBg from "@/assets/b300a862ad5004e30466f6b55f8cf41a972c15d6.png";
-import imgHytaleChar from "@/assets/69f648bc647c0625f843e44be9e8564f22ad27b5.png";
 import imgHytaleIcon from "@/assets/f8a73630a828371b55cb47c704c6c84b5e6031ca.png";
 import imgHytalePricingIcon from "@/assets/6e961948fc1856b917e44a6b39328008fbc6449e.png";
 
-import imgCs2Bg from "@/assets/009d88ff4ead575b381cf22ed903e3663684f638.png";
 import imgCs2Icon from "@/assets/c82ff8fbe9fc26401e78bc69f98e3fd9d3442d77.png";
 
 import imgGarrysModIcon from "@/assets/5772eaa1b74aafcbf91af901345f72098fd056f8.png";
-import imgGarrysModBg from "@/assets/3e16f6bf7ae00f262f7683f2e9dbd0df2943bbaf.png";
-const imgConsole = "/img1/panel.png";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
-import svgPaths from "../../imports/svg-1rflh19blp";
+const imgConsole = "/img1/panel.png";
 
 type Plan = {
   name: string;
@@ -66,7 +57,6 @@ type GameData = {
   name: string;
   bgImage: string;
   videoSrc?: string;
-  charImage: string;
   icon: string;
   pricingIcon: string;
   startingPrice: string;
@@ -81,7 +71,6 @@ const games: Record<string, GameData> = {
     name: "Minecraft",
     bgImage: imgMinecraftBg,
     videoSrc: "/vid/minecraft.mp4",
-    charImage: imgMinecraftChar,
     icon: imgMinecraftIcon,
     pricingIcon: imgMinecraftPricingIcon,
     startingPrice: "₹40.00/month",
@@ -169,7 +158,6 @@ const games: Record<string, GameData> = {
     name: "ARK",
     bgImage: imgArkBg,
     videoSrc: "/vid/ark.mp4",
-    charImage: imgArkChar,
     icon: imgArkIcon,
     pricingIcon: imgArkPricingIcon,
     startingPrice: "₹80.00/month",
@@ -233,7 +221,6 @@ const games: Record<string, GameData> = {
     name: "Hytale",
     bgImage: imgHytaleBg,
     videoSrc: "/vid/hytale.mp4",
-    charImage: imgHytaleChar,
     icon: imgHytaleIcon,
     pricingIcon: imgHytalePricingIcon,
     startingPrice: "₹90.00/month",
@@ -296,8 +283,6 @@ const games: Record<string, GameData> = {
     id: "GarrysMod",
     name: "Garry's Mod",
     bgImage: assets.imgGarrysMod,
-    // No garrysmod.mp4 available – will fall back to static image
-    charImage: imgGarrysModIcon,
     icon: imgGarrysModIcon,
     pricingIcon: imgGarrysModIcon,
     startingPrice: "₹90.00/month",
@@ -361,7 +346,6 @@ const games: Record<string, GameData> = {
     name: "CS2",
     bgImage: assets.imgCsgo,
     videoSrc: "/vid/cs2.mp4",
-    charImage: imgCs2Icon, // Using icon as fallback/placeholder for char image
     icon: imgCs2Icon,
     pricingIcon: imgCs2Icon,
     startingPrice: "₹90.00/month",
@@ -423,9 +407,8 @@ const games: Record<string, GameData> = {
   Rust: {
     id: "Rust",
     name: "Rust",
-    bgImage: assets.imgRust, // Using Rust banner
+    bgImage: assets.imgRust,
     videoSrc: "/vid/rust.mp4",
-    charImage: assets.imgRust, // Using icon/banner as placeholder
     icon: assets.imgRust,
     pricingIcon: assets.imgRust,
     startingPrice: "₹90.00/month",
@@ -487,9 +470,8 @@ const games: Record<string, GameData> = {
   Valheim: {
     id: "Valheim",
     name: "Valheim",
-    bgImage: assets.imgValheim, // Using Valheim banner
+    bgImage: assets.imgValheim,
     videoSrc: "/vid/valheim.mp4",
-    charImage: assets.imgValheim, // Using Valheim icon/banner
     icon: assets.imgValheim,
     pricingIcon: assets.imgValheim,
     startingPrice: "₹90.00/month",
@@ -666,7 +648,7 @@ export default function GameHosting() {
             {["Mo", "3Mo", "Yr"].map((cycle) => (
               <button
                 key={cycle}
-                onClick={() => setBillingCycle(cycle as any)}
+                onClick={() => setBillingCycle(cycle as "Mo" | "3Mo" | "Yr")}
                 className={clsx(
                   "px-4 py-1.5 rounded-full text-xs font-medium transition-all relative",
                   billingCycle === cycle
@@ -849,9 +831,15 @@ export default function GameHosting() {
                   key={`${plan.name}-${planTier}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{
+                    delay: index * 0.1,
+                    duration: 0.2,
+                    ease: "easeOut",
+                  }}
                   className={clsx(
-                    "relative rounded-3xl border transition-all duration-300 group",
+                    "relative rounded-3xl border transition-colors duration-300 group cursor-pointer",
                     isPopular
                       ? "bg-gradient-to-br from-teal-950/40 to-[#0a0a0a] border-teal-500/50 shadow-xl shadow-teal-500/10"
                       : "bg-gradient-to-br from-[#111] to-[#0a0a0a] border-white/10 hover:border-teal-500/30",
@@ -867,6 +855,13 @@ export default function GameHosting() {
                   )}
 
                   <div className="relative z-10 p-6 overflow-hidden rounded-3xl">
+                    {/* Hover shine sweep */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent pointer-events-none rounded-3xl"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.55, ease: "easeInOut" }}
+                    />
                     {/* Decorative Background Icon */}
                     <div className="absolute -right-4 -top-4 opacity-[0.03] transform rotate-12 group-hover:rotate-0 transition-transform duration-500">
                       <ImageWithFallback
@@ -1020,9 +1015,14 @@ export default function GameHosting() {
             </div>
 
             <div className="flex items-center gap-4 mt-8">
-              <button className="px-6 py-2 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-500 transition-colors">
+              <a
+                href="https://gp.belyxhost.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 rounded-full bg-teal-600 text-white font-medium text-sm hover:bg-teal-500 transition-colors"
+              >
                 Console
-              </button>
+              </a>
               <button className="px-6 py-2 rounded-full bg-white/5 text-white/60 font-medium text-sm hover:text-white hover:bg-white/10 transition-colors">
                 File Manager
               </button>
@@ -1106,26 +1106,8 @@ export default function GameHosting() {
               USE COUPON CODE: WELCOME10
             </p>
 
-            <div className="flex items-center gap-4 justify-center md:justify-end text-white">
-              <div className="text-center">
-                <span className="text-3xl font-bold font-mono">00</span>
-                <p className="text-[10px] text-white/40 uppercase">Days</p>
-              </div>
-              <span className="text-2xl text-white/20">:</span>
-              <div className="text-center">
-                <span className="text-3xl font-bold font-mono">14</span>
-                <p className="text-[10px] text-white/40 uppercase">Hrs</p>
-              </div>
-              <span className="text-2xl text-white/20">:</span>
-              <div className="text-center">
-                <span className="text-3xl font-bold font-mono">45</span>
-                <p className="text-[10px] text-white/40 uppercase">Min</p>
-              </div>
-              <span className="text-2xl text-white/20">:</span>
-              <div className="text-center">
-                <span className="text-3xl font-bold font-mono">08</span>
-                <p className="text-[10px] text-white/40 uppercase">Sec</p>
-              </div>
+            <div className="flex items-center justify-center md:justify-end">
+              <CountdownTimer labelSize="text-[10px]" />
             </div>
           </div>
         </div>
@@ -1139,7 +1121,7 @@ function FeaturePill({
   title,
   subtitle,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
 }) {
@@ -1161,7 +1143,7 @@ function FeatureCard({
   title,
   desc,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   desc: string;
 }) {

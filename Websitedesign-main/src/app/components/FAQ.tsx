@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { spring } from "../lib/animations";
+import { spring, viewportDefaults } from "../lib/animations";
 
 const faqs = [
   {
@@ -27,25 +27,38 @@ export function FAQ() {
 
   return (
     <div className="py-20 px-6 max-w-7xl mx-auto flex flex-col md:flex-row gap-12">
-      <div className="md:w-1/3">
+      <motion.div
+        className="md:w-1/3"
+        initial={{ opacity: 0, x: -24 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={viewportDefaults}
+        transition={{ ...spring.gentle, delay: 0.05 }}
+      >
         <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-4">
           Frequently Asked Questions
         </h2>
         <p className="text-white/60 mb-8">
           Everything you need to know about our game hosting services.
         </p>
-        <button
-          className="w-48 bg-teal-500/10 border border-teal-500/30 text-teal-400 hover:bg-teal-500/20 px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(20,184,166,0.15)] transition-all"
+        <a
+          href="https://discord.gg/Cv3tTtwanC"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block w-48 bg-teal-500/10 border border-teal-500/30 text-teal-400 hover:bg-teal-500/20 px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(20,184,166,0.15)] transition-all"
         >
           Contact Support
-        </button>
-      </div>
+        </a>
+      </motion.div>
 
       <div className="md:w-2/3 space-y-4">
         {faqs.map((faq, i) => (
-          <div
+          <motion.div
             key={i}
-            className="border border-white/10 rounded-xl bg-white/5 overflow-hidden"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportDefaults}
+            transition={{ ...spring.gentle, delay: i * 0.07 }}
+            className="border border-white/10 rounded-xl bg-white/5 overflow-hidden hover:border-white/20 transition-colors duration-300"
           >
             <button
               className="w-full flex items-center justify-between p-6 text-left"
@@ -56,7 +69,9 @@ export function FAQ() {
                 animate={{ rotate: openIndex === i ? 180 : 0 }}
                 transition={spring.snappy}
               >
-                <ChevronDown className={`w-5 h-5 ${openIndex === i ? "text-teal-400" : "text-white/40"}`} />
+                <ChevronDown
+                  className={`w-5 h-5 ${openIndex === i ? "text-teal-400" : "text-white/40"}`}
+                />
               </motion.div>
             </button>
             <AnimatePresence>
@@ -73,7 +88,7 @@ export function FAQ() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

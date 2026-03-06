@@ -1,18 +1,9 @@
 import { Link, Outlet, useLocation } from "react-router";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import PageLoader from "../PageLoader";
 import { assets } from "../../assets";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  ShoppingCart,
-  Home,
-  Gamepad2,
-  Server,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { Menu, X, ShoppingCart, Home, Gamepad2, Server } from "lucide-react";
 import clsx from "clsx";
 import { spring } from "../../lib/animations";
 import { toast } from "sonner";
@@ -213,7 +204,17 @@ export function Layout() {
 
       {/* Main Content */}
       <main className="pt-20 min-h-[calc(100vh-400px)]">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Footer */}
@@ -240,14 +241,50 @@ export function Layout() {
                 Experience low latency, DDoS protection, and 24/7 support.
               </p>
               <div className="flex gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
-                  >
-                    <div className="w-4 h-4 bg-white/40 rounded-sm" />
-                  </div>
-                ))}
+                <a
+                  href="https://discord.gg/KcxZMSctMG"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/img1/discord.png"
+                    alt="Discord"
+                    className="w-8 h-8 rounded-full bg-white/5 p-1.5 hover:bg-white/10 transition-colors"
+                  />
+                </a>
+                <a
+                  href="https://youtube.com/@belyxhost?si=DRH7f_nveOLELZCC"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/img1/youtube.png"
+                    alt="YouTube"
+                    className="w-8 h-8 rounded-full bg-white/5 p-1.5 hover:bg-white/10 transition-colors"
+                  />
+                </a>
+                <a
+                  href="https://www.instagram.com/belyxhost?igsh=MTFsM2RzNWM5eDZ6bw%3D%3D&utm_source=qr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/img1/instagram.png"
+                    alt="Instagram"
+                    className="w-8 h-8 rounded-full bg-white/5 p-1.5 hover:bg-white/10 transition-colors"
+                  />
+                </a>
+                <a
+                  href="https://www.trustpilot.com/review/billing.belyxhost.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/img1/trustpilot.png"
+                    alt="Trustpilot"
+                    className="w-8 h-8 rounded-full bg-white/5 p-1.5 hover:bg-white/10 transition-colors"
+                  />
+                </a>
               </div>
             </div>
 

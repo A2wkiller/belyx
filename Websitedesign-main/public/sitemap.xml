@@ -18,7 +18,7 @@
   <url>
     <loc>https://belyxhost.com/games/Rust</loc>
     <image:image>
-      <image:loc>https://belyxhost.com/assets/rust.png</image:loc>
+      <image:loc>https://belyxhost.com/assets/Rust-Logo.jpg</image:loc>
       <image:title>Rust Server Hosting</image:title>
       <image:caption>High-performance Rust server hosting at BelyxHost</image:caption>
       <image:license>https://belyxhost.com/terms</image:license>
@@ -36,7 +36,7 @@
   <url>
     <loc>https://belyxhost.com/games/Valheim</loc>
     <image:image>
-      <image:loc>https://belyxhost.com/assets/valheim.png</image:loc>
+      <image:loc>https://belyxhost.com/assets/valheim-logo.png</image:loc>
       <image:title>Valheim Server Hosting</image:title>
       <image:caption>High-performance Valheim server hosting at BelyxHost</image:caption>
       <image:license>https://belyxhost.com/terms</image:license>
